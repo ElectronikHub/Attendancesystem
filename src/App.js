@@ -7,8 +7,8 @@ export default function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/public" element={<PublicRFIDPage />} />
+        <Route path="/" element={<PublicRFIDPage />} />
+        <Route path="/admin" element={<Dashboard />} />
       </Routes>
     </Router>
   );
