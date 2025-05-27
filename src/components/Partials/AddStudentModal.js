@@ -4,8 +4,8 @@ import { api } from "./Api";
 function Modal({ show, onClose, children }) {
     if (!show) return null;
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg shadow-lg p-6 min-w-[320px] relative">
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 w-full">
+            <div className="bg-white rounded-lg shadow-lg p-6 w-1/4 min-w-[320px] relative">
                 <button
                     className="absolute top-2 right-3 text-gray-500 hover:text-gray-700 text-2xl font-bold"
                     onClick={onClose}
@@ -98,12 +98,40 @@ export default function AddStudentModal({ show, onClose, addForm, setAddForm }) 
                     value={addForm.ParentName}
                     onChange={(e) => setAddForm({ ...addForm, ParentName: e.target.value })}
                 />
-                <input
-                    className="border rounded px-3 py-2 w-full mt-2"
-                    placeholder="Parent Contact"
-                    value={addForm.ParentContact}
-                    onChange={(e) => setAddForm({ ...addForm, ParentContact: e.target.value })}
-                />
+<input
+  className="border rounded px-3 py-2 w-full mt-2"
+  placeholder="Parent Contact"
+  value={addForm.ParentContact}
+  onChange={e => {
+    let val = e.target.value;
+
+    // Always keep "+63" at the start
+    if (!val.startsWith("+63")) {
+      // If user tries to delete "+", restore it
+      val = "+63" + val.replace(/[^0-9]/g, "");
+    }
+
+    // Remove non-numeric after +63
+    val = "+63" + val.slice(3).replace(/[^0-9]/g, "");
+
+    // Limit to 13 chars (+63 + 10 digits)
+    val = val.slice(0, 13);
+
+    setAddForm({ ...addForm, ParentContact: val });
+  }}
+  onKeyDown={e => {
+    // Prevent deleting "+63" prefix
+    if (
+      (addForm.ParentContact.length <= 3 && (e.key === "Backspace" || e.key === "Delete")) ||
+      (addForm.ParentContact.length === 3 && e.key === "ArrowLeft")
+    ) {
+      e.preventDefault();
+    }
+  }}
+  maxLength={13}
+/>
+
+
             </div>
             <div className="flex justify-end gap-2 mt-6">
                 <button

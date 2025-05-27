@@ -20,7 +20,7 @@ export default function Dashboard() {
     Section: "",
     rfid: "",
     ParentName: "",
-    ParentContact: "",
+    ParentContact: "+63"
   });
 
   // Form states for adding schedule
