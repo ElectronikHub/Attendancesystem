@@ -4,7 +4,7 @@ export default function QuickActions({
     onAddStudent,
     onAddSchedule,
     onExport,
-    onReport,
+    onShowStudents, // <-- update prop name
 }) {
     return (
         <div className="bg-white rounded-lg shadow p-5">
@@ -30,9 +30,9 @@ export default function QuickActions({
                 </button>
                 <button
                     className="flex-1 min-w-[120px] bg-orange-600 text-white px-4 py-2 rounded font-medium hover:bg-orange-700"
-                    onClick={onReport}
+                    onClick={onShowStudents}
                 >
-                    Generate Report
+                    Student List
                 </button>
             </div>
         </div>

@@ -5,12 +5,18 @@ import QuickActions from "./Partials/QuickActions";
 import AttendanceRecords from "./Partials/AttendanceRecords";
 import AddStudentModal from "./Partials/AddStudentModal";
 import AddScheduleModal from "./Partials/AddScheduleModal";
-import { api } from "./Partials/Api"; // Axios instance configured with your backend baseURL
+import ExportDataModal from "./Partials/ExportDataModal";
+import StudentListModal from "./Partials/StudentListModal"; // <-- Add this import
+import { api } from "./Partials/Api";
+
+const API_BASE = "http://api.ehub.ph/rfidapi.php"; // <-- Set your backend path
 
 export default function Dashboard() {
   // Modal visibility states
   const [showAddModal, setShowAddModal] = useState(false);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [showStudentListModal, setShowStudentListModal] = useState(false);
 
   // Form states for adding student
   const [addForm, setAddForm] = useState({
@@ -196,8 +202,8 @@ export default function Dashboard() {
           <QuickActions
             onAddStudent={() => setShowAddModal(true)}
             onAddSchedule={() => setShowScheduleModal(true)}
-            onExport={() => alert("Export Data")}
-            onReport={() => alert("Generate Report")}
+            onExport={() => setShowExportModal(true)}
+            onShowStudents={() => setShowStudentListModal(true)}
           />
         </div>
 
@@ -229,6 +235,17 @@ export default function Dashboard() {
         scheduleForm={scheduleForm}
         setScheduleForm={setScheduleForm}
         handleAddSchedule={handleAddSchedule}
+      />
+
+      <ExportDataModal
+        show={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        apiBase={API_BASE}
+      />
+
+      <StudentListModal
+        show={showStudentListModal}
+        onClose={() => setShowStudentListModal(false)}
       />
     </div>
   );
