@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 export default function AttendanceRecords({
   attendance,
@@ -9,8 +9,6 @@ export default function AttendanceRecords({
   onDelete,
   onTimeOut,
 }) {
-  const [showTimeOut, setShowTimeOut] = useState(false);
-
   // Convert date string to Date object in Philippines timezone
   const toPHDate = (dateStr) => {
     if (!dateStr) return null;
@@ -57,7 +55,7 @@ export default function AttendanceRecords({
   // Defensive check: ensure attendance is an array
   const safeAttendance = Array.isArray(attendance) ? attendance : [];
 
-  // Filter attendance based on search and day filter (but NOT on time in/out)
+  // Filter attendance based on search and day filter
   const filteredAttendance = safeAttendance.filter((rec) => {
     const matchesSearch =
       rec.student_name?.toLowerCase().includes(search.toLowerCase()) ||
@@ -84,16 +82,17 @@ export default function AttendanceRecords({
   return (
     <div className="bg-white rounded-lg shadow p-5">
       {/* Header with tabs */}
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold text-gray-700">Attendance Records</h3>
         <div className="flex gap-4">
           {["Today", "This Week", "This Month"].map((period) => (
             <button
               key={period}
-              className={`text-sm font-semibold border-b-2 ${tab === period
+              className={`text-sm font-semibold border-b-2 transition-colors ${
+                tab === period
                   ? "text-blue-600 border-blue-600"
-                  : "text-gray-500 border-transparent"
-                }`}
+                  : "text-gray-500 border-transparent hover:text-gray-700"
+              }`}
               onClick={() => setTab(period)}
             >
               {period}
@@ -103,9 +102,9 @@ export default function AttendanceRecords({
       </div>
 
       {/* Search bar */}
-      <div className="flex gap-2 mb-3 items-center">
+      <div className="flex gap-2 mb-4">
         <input
-          className="border rounded px-3 py-2 flex-1"
+          className="border rounded px-3 py-2 flex-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Search by name, ID, or class..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -116,64 +115,61 @@ export default function AttendanceRecords({
       <div className="overflow-x-auto">
         <table className="min-w-full text-sm">
           <thead>
-            <tr className="bg-gray-50 text-gray-600">
-              <th className="py-2 px-3 text-left">STUDENT</th>
-              <th className="py-2 px-3 text-left">ID</th>
-              <th className="py-2 px-3 text-left">CLASS</th>
-              <th
-                className="py-2 px-3 text-left cursor-pointer select-none text-blue-600 hover:underline"
-                onClick={() => setShowTimeOut(!showTimeOut)}
-                title="Click to toggle Time In / Time Out"
-              >
-                TIME {showTimeOut ? "OUT" : "IN"} &#x21C5;
-              </th>
-              <th className="py-2 px-3 text-left">STATUS</th>
-              <th className="py-2 px-3 text-left">ACTIONS</th>
+            <tr className="bg-gray-50 text-gray-600 uppercase text-xs">
+              <th className="py-3 px-3 text-left">Student</th>
+              <th className="py-3 px-3 text-left">ID</th>
+              <th className="py-3 px-3 text-left">Class</th>
+              <th className="py-3 px-3 text-left text-blue-700">Time In</th>
+              <th className="py-3 px-3 text-left text-orange-700">Time Out</th>
+              <th className="py-3 px-3 text-left">Status</th>
+              <th className="py-3 px-3 text-left">Actions</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-gray-100">
             {filteredAttendance.length === 0 ? (
               <tr>
-                <td colSpan={6} className="text-center text-gray-400 py-8">
+                <td colSpan={7} className="text-center text-gray-400 py-10">
                   No records found
                 </td>
               </tr>
             ) : (
               filteredAttendance.map((rec) => (
-                <tr key={rec.id} className="border-b">
-                  <td className="py-2 px-3">{rec.student_name || "N/A"}</td>
-                  <td className="py-2 px-3">{rec.student_id || "N/A"}</td>
-                  <td className="py-2 px-3">{rec.class || "N/A"}</td>
-                  <td className="py-2 px-3">
-                    {showTimeOut
-                      ? rec.time_out
-                        ? rec.time_out
-                        : <em className="text-gray-400">Not timed out</em>
-                      : rec.time_in
-                        ? rec.time_in
-                        : <em className="text-gray-400">No time in</em>
-                    }
+                <tr key={rec.id} className="hover:bg-gray-50 transition-colors">
+                  <td className="py-3 px-3 font-medium">{rec.student_name || "N/A"}</td>
+                  <td className="py-3 px-3 text-gray-600">{rec.student_id || "N/A"}</td>
+                  <td className="py-3 px-3 text-gray-600">{rec.class || "N/A"}</td>
+                  <td className="py-3 px-3">
+                    {rec.time_in ? rec.time_in : <span className="text-gray-300">--:--</span>}
                   </td>
-                  <td className="py-2 px-3">
-                    <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">
-                      {rec.status || "N/A"}
+                  <td className="py-3 px-3">
+                    {rec.time_out ? (
+                      rec.time_out
+                    ) : (
+                      <span className="text-gray-300 italic text-xs">Pending</span>
+                    )}
+                  </td>
+                  <td className="py-3 px-3">
+                    <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-medium">
+                      {rec.status || "Present"}
                     </span>
                   </td>
-                  <td className="py-2 px-3">
-                    <button
-                      className="text-red-500 hover:text-red-700 text-xs"
-                      onClick={() => onDelete(rec.id)}
-                    >
-                      Delete
-                    </button>
-                    {onTimeOut && !rec.time_out && (
+                  <td className="py-3 px-3">
+                    <div className="flex gap-3">
+                      {onTimeOut && !rec.time_out && (
+                        <button
+                          className="text-blue-600 hover:text-blue-800 font-semibold text-xs"
+                          onClick={() => onTimeOut(rec.id)}
+                        >
+                          Time Out
+                        </button>
+                      )}
                       <button
-                        className="ml-2 text-blue-500 hover:text-blue-700 text-xs"
-                        onClick={() => onTimeOut(rec.id)}
+                        className="text-red-500 hover:text-red-700 text-xs"
+                        onClick={() => onDelete(rec.id)}
                       >
-                        Time Out
+                        Delete
                       </button>
-                    )}
+                    </div>
                   </td>
                 </tr>
               ))
@@ -182,9 +178,8 @@ export default function AttendanceRecords({
         </table>
       </div>
 
-      <div className="text-xs text-gray-500 mt-2">
-        Showing {filteredAttendance.length} record
-        {filteredAttendance.length !== 1 ? "s" : ""}
+      <div className="text-xs text-gray-500 mt-4 border-t pt-2">
+        Showing **{filteredAttendance.length}** record{filteredAttendance.length !== 1 ? "s" : ""}
       </div>
     </div>
   );
